@@ -35,20 +35,27 @@ scenarioView.innerHTML = `
     <p>你在清邁旅行時認識一位泰國朋友。從打招呼開始，聊到姓名、家鄉、工作和喜歡的食物。</p>
   </header>
   <div class="script-sheet" aria-label="初次見面完整對話">
+    <div class="script-columns" aria-hidden="true">
+      <span></span><strong>泰文課文</strong><strong>中文對照</strong>
+    </div>
     ${firstMeetingScript.map((line, number) => `
       <article class="script-line ${line.role}">
-        <div class="speaker"><span>${line.speaker}</span></div>
-        <div class="speech">
-          <div class="speech-top"><span class="meaning">${line.zh}</span><span class="line-number">${String(number + 1).padStart(2, '0')}</span></div>
-          <div class="script-thai">${line.thai}</div>
+        <div class="line-number">${number + 1}</div>
+        <div class="thai-cell">
+          <div class="thai-line">
+            <span class="speaker">${line.speaker}：</span>
+            <span class="script-thai">${line.thai}</span>
+            <button class="line-audio" type="button" data-line="${number}" aria-label="播放：${line.zh}"><span class="audio-icon">🔊</span><span class="audio-text">播放</span></button>
+          </div>
           <div class="script-phonetic">${line.phonetic}</div>
         </div>
-        <button class="line-audio" type="button" data-line="${number}" aria-label="播放：${line.zh}"><span class="audio-icon">🔊</span><span class="audio-text">播放</span></button>
+        <div class="meaning"><span class="translation-speaker">${line.speaker}：</span>${line.zh}</div>
       </article>`).join('')}
   </div>`;
 document.querySelector('.stage').appendChild(scenarioView);
 
 function showScenario() {
+  document.querySelector('.stage').classList.add('scenario-mode');
   normalStageElements.forEach(element => { element.hidden = true; });
   scenarioView.hidden = false;
   document.querySelectorAll('.topic').forEach(item => item.classList.toggle('active', item === scenarioButton));
@@ -56,15 +63,24 @@ function showScenario() {
 }
 
 function showCards() {
+  document.querySelector('.stage').classList.remove('scenario-mode');
   normalStageElements.forEach(element => { element.hidden = false; });
   scenarioView.hidden = true;
 }
 
-scenarioButton.addEventListener('click', showScenario);
+scenarioButton.addEventListener('click', event => {
+  event.stopImmediatePropagation();
+  showScenario();
+});
 document.querySelector('.topics').addEventListener('click', event => {
   const button = event.target.closest('.topic');
   if (button && button !== scenarioButton) showCards();
 });
+
+document.addEventListener('keydown', event => {
+  if (!document.querySelector('.stage').classList.contains('scenario-mode')) return;
+  if (['ArrowLeft', 'ArrowRight', ' ', 'Enter'].includes(event.key)) event.stopPropagation();
+}, true);
 
 scenarioView.addEventListener('click', async event => {
   const button = event.target.closest('.line-audio');
@@ -102,17 +118,21 @@ scenarioView.addEventListener('click', async event => {
 const scenarioStyle = document.createElement('style');
 scenarioStyle.textContent = `
   .scenario-view{display:block}.scenario-view[hidden]{display:none}
+  .stage.scenario-mode{display:block;min-height:0}
+  .stage.scenario-mode>.progress,.stage.scenario-mode>#topicName,.stage.scenario-mode>#card,.stage.scenario-mode>.controls,.stage.scenario-mode>#status,.stage.scenario-mode>#dots{display:none!important}
+  .stage.scenario-mode>.scenario-view{display:block!important;width:100%}
   .scenario-head{padding:2px 0 22px}.scenario-kicker{color:var(--teal);font-size:.78rem;font-weight:900;letter-spacing:.08em}
   .scenario-head h2{margin:8px 0 7px;font-size:clamp(1.55rem,4vw,2.2rem)}.scenario-head p{max-width:680px;margin:0;color:var(--muted);line-height:1.7}
   .script-sheet{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
-  .script-line{display:grid;grid-template-columns:82px minmax(0,1fr) 64px;gap:16px;align-items:center;padding:18px 2px;border-bottom:1px solid var(--line)}
-  .script-line:last-child{border-bottom:0}.speaker{font-size:.78rem;font-weight:900;color:var(--muted);text-align:left}.speaker span{display:inline-block}
-  .script-line.me .speaker{color:#c43e22}.script-line.me{box-shadow:inset 3px 0 0 #ee604066}.script-line.partner{box-shadow:inset 3px 0 0 #127d7444}
-  .speech{min-width:0;padding:0 4px}.speech-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}.meaning{font-weight:900}.line-number{font-size:.7rem;color:#aa9b91;font-variant-numeric:tabular-nums}
-  .script-thai{margin-top:5px;color:var(--teal);font-size:1.35rem;font-weight:850;line-height:1.5}.script-phonetic{margin-top:2px;color:var(--muted);font-size:.88rem;overflow-wrap:anywhere}
-  .line-audio{min-height:46px;border:0;border-radius:12px;background:#f5ede6;color:var(--ink);cursor:pointer;font-weight:850;display:grid;place-items:center;align-content:center;gap:1px}
-  .audio-icon{font-size:1rem}.audio-text{font-size:.68rem}.line-audio:hover{background:#eee1d6}.line-audio.playing{background:var(--orange);color:#fff}
-  @media(max-width:720px){.scenario-head{padding-top:0}.scenario-head p{font-size:.88rem}.script-line{grid-template-columns:58px minmax(0,1fr) 46px;gap:8px;padding:15px 0}.speaker{font-size:.72rem;text-align:center}.speech{padding:0}.script-thai{font-size:1.12rem}.script-phonetic{font-size:.78rem}.line-audio{min-height:46px;border-radius:10px}.audio-text{display:none}}
-  @media(max-width:390px){.script-line{grid-template-columns:50px minmax(0,1fr) 42px;gap:6px}.scenario-head p{display:none}.meaning{font-size:.88rem}.line-number{display:none}}
+  .script-columns{display:grid;grid-template-columns:34px minmax(0,1.35fr) minmax(180px,.8fr);gap:18px;padding:10px 4px;background:#f5ede6;color:var(--muted);font-size:.78rem;letter-spacing:.05em}
+  .script-line{display:grid;grid-template-columns:34px minmax(0,1.35fr) minmax(180px,.8fr);gap:18px;align-items:start;padding:17px 4px;border-bottom:1px solid var(--line)}
+  .script-line:last-child{border-bottom:0}.line-number{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;background:var(--orange);color:#fff;font-size:.72rem;font-weight:900;font-variant-numeric:tabular-nums}
+  .thai-cell{min-width:0}.thai-line{display:flex;align-items:flex-start;gap:7px;min-width:0}.speaker{flex:0 0 auto;padding-top:3px;font-size:.8rem;font-weight:900;color:var(--muted)}
+  .script-line.me .speaker{color:#c43e22}.script-thai{min-width:0;flex:1;color:var(--teal);font-size:1.25rem;font-weight:850;line-height:1.45}
+  .script-phonetic{margin:4px 0 0;color:var(--muted);font-size:.82rem;overflow-wrap:anywhere}.meaning{padding-top:3px;line-height:1.55;font-weight:800}.translation-speaker{display:none;color:var(--muted);font-size:.78rem}
+  .line-audio{flex:0 0 auto;min-width:52px;min-height:36px;border:0;border-radius:10px;background:#f5ede6;color:var(--ink);cursor:pointer;font-weight:850;display:flex;align-items:center;justify-content:center;gap:3px;padding:5px 8px}
+  .audio-icon{font-size:.9rem}.audio-text{font-size:.68rem}.line-audio:hover{background:#eee1d6}.line-audio.playing{background:var(--orange);color:#fff}
+  @media(max-width:720px){.scenario-head{padding-top:0}.scenario-head p{font-size:.88rem}.script-columns{display:none}.script-line{grid-template-columns:28px minmax(0,1fr);gap:9px;padding:15px 1px}.line-number{width:22px;height:22px}.thai-cell{grid-column:2}.meaning{grid-column:2;padding:7px 0 0;border-top:1px dashed var(--line);font-size:.9rem}.translation-speaker{display:inline}.script-thai{font-size:1.1rem}.script-phonetic{font-size:.76rem}.line-audio{min-width:42px;min-height:38px;padding:4px}.audio-text{display:none}}
+  @media(max-width:390px){.scenario-head p{display:none}.thai-line{gap:4px}.speaker{font-size:.72rem}.script-thai{font-size:1.02rem}.line-audio{min-width:38px}}
 `;
 document.head.appendChild(scenarioStyle);
