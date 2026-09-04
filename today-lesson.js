@@ -195,7 +195,8 @@ scenarioStyle.textContent = `
   .scenario-view{display:block}.scenario-view[hidden]{display:none}
   .stage.scenario-mode{display:block;min-height:0}
   .stage.scenario-mode>.progress,.stage.scenario-mode>#topicName,.stage.scenario-mode>#card,.stage.scenario-mode>.controls,.stage.scenario-mode>#status,.stage.scenario-mode>#dots{display:none!important}
-  .stage.scenario-mode>.scenario-view{display:block!important;width:100%}
+  .stage.scenario-mode>.scenario-view:not([hidden]){display:block!important;width:100%}
+  .stage.scenario-mode>.scenario-view[hidden]{display:none!important}
   .scenario-head{padding:2px 0 22px}.scenario-kicker{color:var(--teal);font-size:.78rem;font-weight:900;letter-spacing:.08em}
   .scenario-head h2{margin:8px 0 7px;font-size:clamp(1.55rem,4vw,2.2rem)}.scenario-head p{max-width:680px;margin:0;color:var(--muted);line-height:1.7}
   .script-sheet{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
