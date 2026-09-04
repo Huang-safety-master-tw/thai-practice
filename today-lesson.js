@@ -15,11 +15,38 @@ const firstMeetingScript = [
   { speaker: '泰國朋友', role: 'partner', zh: '我也很高興認識你', thai: 'ยินดีที่ได้รู้จักเช่นกันค่ะ', phonetic: 'yin-dii thîi dâi rúu-jàk chên-gan khâ' }
 ];
 
+const nightMarketScript = [
+  { speaker: '店員', role: 'partner', zh: '你好，想要什麼？', thai: 'สวัสดีค่ะ ต้องการอะไรคะ', phonetic: 'sà-wàt-dii khâ, tɔ̂ng-gaan à-rai khá' },
+  { speaker: '你', role: 'me', zh: '請問有甜糯米粽嗎？', thai: 'มีข้าวต้มมัดไหมครับ', phonetic: 'mii khâao-tôm-mát mǎi khráp' },
+  { speaker: '店員', role: 'partner', zh: '沒有。', thai: 'ไม่มีค่ะ', phonetic: 'mâi mii khâ' },
+  { speaker: '你', role: 'me', zh: '請問有香蕉嗎？', thai: 'มีกล้วยไหมครับ', phonetic: 'mii glûai mǎi khráp' },
+  { speaker: '店員', role: 'partner', zh: '有，需要多少？', thai: 'มีค่ะ ต้องการเท่าไหร่คะ', phonetic: 'mii khâ, tɔ̂ng-gaan thâo-rài khá' },
+  { speaker: '你', role: 'me', zh: '我要一串。', thai: 'ผมต้องการหนึ่งหวีครับ', phonetic: 'phǒm tɔ̂ng-gaan nʉ̀ng wǐi khráp' },
+  { speaker: '店員', role: 'partner', zh: '一串香蕉90泰銖，要嗎？', thai: 'กล้วยหนึ่งหวีเก้าสิบบาทค่ะ รับไหมคะ', phonetic: 'glûai nʉ̀ng wǐi gâo-sìp bàat khâ, ráp mǎi khá' },
+  { speaker: '你', role: 'me', zh: '要。', thai: 'รับครับ', phonetic: 'ráp khráp' },
+  { speaker: '店員', role: 'partner', zh: '還需要其他東西嗎？', thai: 'ต้องการอะไรอีกไหมคะ', phonetic: 'tɔ̂ng-gaan à-rai ìik mǎi khá' },
+  { speaker: '你', role: 'me', zh: '我要一杯泰式奶茶。', thai: 'ผมต้องการชานมเย็นครับ', phonetic: 'phǒm tɔ̂ng-gaan chaa-nom-yen khráp' },
+  { speaker: '店員', role: 'partner', zh: '想要什麼甜度？', thai: 'ต้องการหวานระดับไหนคะ', phonetic: 'tɔ̂ng-gaan wǎan rá-dàp nǎi khá' },
+  { speaker: '你', role: 'me', zh: '少甜。', thai: 'หวานน้อยครับ', phonetic: 'wǎan nɔ́ɔi khráp' },
+  { speaker: '店員', role: 'partner', zh: '總共140泰銖。', thai: 'ทั้งหมดหนึ่งร้อยสี่สิบบาทค่ะ', phonetic: 'tháng-mòt nʉ̀ng-rɔ́ɔi sìi-sìp bàat khâ' },
+  { speaker: '店員', role: 'partner', zh: '要付現金還是信用卡？', thai: 'ต้องการจ่ายเงินสดหรือบัตรเครดิตคะ', phonetic: 'tɔ̂ng-gaan jàai ngoen-sòt rʉ̌ʉ bàt khree-dìt khá' },
+  { speaker: '你', role: 'me', zh: '付現。這是200泰銖。', thai: 'เงินสดครับ นี่สองร้อยบาทครับ', phonetic: 'ngoen-sòt khráp, nîi sɔ̌ɔng-rɔ́ɔi bàat khráp' },
+  { speaker: '店員', role: 'partner', zh: '這是找您的40泰銖。', thai: 'นี่เงินทอนของคุณค่ะ สี่สิบบาท', phonetic: 'nîi ngoen-thɔɔn khɔ̌ɔng khun khâ, sìi-sìp bàat' },
+  { speaker: '你', role: 'me', zh: '找零不夠，還差20泰銖。', thai: 'เงินทอนไม่ครบครับ ขาดอีกยี่สิบบาท', phonetic: 'ngoen-thɔɔn mâi khróp khráp, khàat ìik yîi-sìp bàat' },
+  { speaker: '店員', role: 'partner', zh: '不好意思，這是另外20泰銖。', thai: 'ขอโทษค่ะ นี่อีกยี่สิบบาทค่ะ', phonetic: 'khɔ̌ɔ-thôot khâ, nîi ìik yîi-sìp bàat khâ' }
+];
+
 const scenarioButton = document.createElement('button');
 scenarioButton.className = 'topic scenario-topic';
 scenarioButton.dataset.scenario = 'first-meeting';
 scenarioButton.textContent = '初次見面';
 document.querySelector('.topics').prepend(scenarioButton);
+
+const marketButton = document.createElement('button');
+marketButton.className = 'topic scenario-topic';
+marketButton.dataset.scenario = 'night-market';
+marketButton.textContent = '夜市點餐';
+scenarioButton.after(marketButton);
 
 const normalStageElements = ['.progress', '#topicName', '#card', '.controls', '#status', '#dots']
   .map(selector => document.querySelector(selector));
@@ -54,27 +81,70 @@ scenarioView.innerHTML = `
   </div>`;
 document.querySelector('.stage').appendChild(scenarioView);
 
+const marketView = document.createElement('section');
+marketView.className = 'scenario-view';
+marketView.hidden = true;
+marketView.setAttribute('aria-live', 'polite');
+marketView.innerHTML = `
+  <header class="scenario-head">
+    <div class="scenario-kicker">生活會話 · 情境 2</div>
+    <h2>泰國夜市買香蕉與奶茶</h2>
+    <p>甜糯米粽賣完了，你改買一串香蕉和少甜泰式奶茶；結帳時發現店員少找20泰銖。</p>
+  </header>
+  <div class="script-sheet" aria-label="夜市點餐完整對話">
+    <div class="script-columns" aria-hidden="true"><span></span><strong>泰文課文</strong><strong>中文對照</strong></div>
+    ${nightMarketScript.map((line, number) => `
+      <article class="script-line ${line.role}">
+        <div class="line-number">${number + 1}</div>
+        <div class="thai-cell">
+          <div class="thai-line">
+            <span class="speaker">${line.speaker}：</span>
+            <span class="script-thai">${line.thai}</span>
+            <button class="line-audio" type="button" data-line="${number}" aria-label="播放：${line.zh}"><span class="audio-icon">🔊</span><span class="audio-text">播放</span></button>
+          </div>
+          <div class="script-phonetic">${line.phonetic}</div>
+        </div>
+        <div class="meaning"><span class="translation-speaker">${line.speaker}：</span>${line.zh}</div>
+      </article>`).join('')}
+  </div>`;
+document.querySelector('.stage').appendChild(marketView);
+
 function showScenario() {
   document.querySelector('.stage').classList.add('scenario-mode');
   normalStageElements.forEach(element => { element.hidden = true; });
   scenarioView.hidden = false;
+  marketView.hidden = true;
   document.querySelectorAll('.topic').forEach(item => item.classList.toggle('active', item === scenarioButton));
   $('count').textContent = `${firstMeetingScript.length} 句對話`;
+}
+
+function showMarketScenario() {
+  document.querySelector('.stage').classList.add('scenario-mode');
+  normalStageElements.forEach(element => { element.hidden = true; });
+  scenarioView.hidden = true;
+  marketView.hidden = false;
+  document.querySelectorAll('.topic').forEach(item => item.classList.toggle('active', item === marketButton));
+  $('count').textContent = `${nightMarketScript.length} 句對話`;
 }
 
 function showCards() {
   document.querySelector('.stage').classList.remove('scenario-mode');
   normalStageElements.forEach(element => { element.hidden = false; });
   scenarioView.hidden = true;
+  marketView.hidden = true;
 }
 
 scenarioButton.addEventListener('click', event => {
   event.stopImmediatePropagation();
   showScenario();
 });
+marketButton.addEventListener('click', event => {
+  event.stopImmediatePropagation();
+  showMarketScenario();
+});
 document.querySelector('.topics').addEventListener('click', event => {
   const button = event.target.closest('.topic');
-  if (button && button !== scenarioButton) showCards();
+  if (button && button !== scenarioButton && button !== marketButton) showCards();
 });
 
 document.addEventListener('keydown', event => {
@@ -82,11 +152,12 @@ document.addEventListener('keydown', event => {
   if (['ArrowLeft', 'ArrowRight', ' ', 'Enter'].includes(event.key)) event.stopPropagation();
 }, true);
 
-scenarioView.addEventListener('click', async event => {
+function bindScenarioAudio(view, script) {
+view.addEventListener('click', async event => {
   const button = event.target.closest('.line-audio');
   if (!button) return;
-  const line = firstMeetingScript[Number(button.dataset.line)];
-  scenarioView.querySelectorAll('.line-audio').forEach(item => {
+  const line = script[Number(button.dataset.line)];
+  document.querySelectorAll('.line-audio').forEach(item => {
     item.disabled = false;
     item.classList.remove('playing');
     item.querySelector('.audio-text').textContent = '播放';
@@ -114,6 +185,10 @@ scenarioView.addEventListener('click', async event => {
     button.querySelector('.audio-text').textContent = '重試';
   }
 });
+}
+
+bindScenarioAudio(scenarioView, firstMeetingScript);
+bindScenarioAudio(marketView, nightMarketScript);
 
 const scenarioStyle = document.createElement('style');
 scenarioStyle.textContent = `
